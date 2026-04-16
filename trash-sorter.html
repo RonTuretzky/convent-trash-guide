@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where Does It Go? - Convent Kitchen Trash Sorter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f0;
+      color: #1a1a1a;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .container { max-width: 640px; width: 100%; }
+
+    h1 { font-size: 1.8rem; margin-bottom: 0.25rem; color: #111; }
+    .subtitle { color: #666; margin-bottom: 2rem; font-size: 0.95rem; }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: #555;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back-link:hover { color: #111; }
+
+    /* Question card */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #222;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.9rem 1.2rem;
+      background: #fafafa;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #333;
+      transition: all 0.15s;
+      text-align: left;
+    }
+    .option-btn:hover {
+      border-color: #999;
+      background: #f0f0f0;
+      transform: translateX(4px);
+    }
+    .option-btn .opt-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      width: 2rem;
+      text-align: center;
+    }
+
+    /* Result card */
+    .result {
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .result-icon {
+      font-size: 4rem;
+      margin-bottom: 0.75rem;
+    }
+    .result-bin {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .result-bin.trash { color: #444; }
+    .result-bin.mgp { color: #1565c0; }
+    .result-bin.paper { color: #2e7d32; }
+    .result-bin.compost { color: #5d4037; }
+
+    .result-bag {
+      display: inline-block;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .result-bag.trash { background: #333; color: #fff; }
+    .result-bag.mgp { background: #e3f2fd; color: #1565c0; }
+    .result-bag.paper { background: #e8f5e9; color: #2e7d32; }
+    .result-bag.compost { background: #efebe9; color: #5d4037; }
+    .result-bin.special { color: #e65100; }
+    .result-bag.special { background: #fff3e0; color: #e65100; }
+    .search-item-bin.special { background: #fff3e0; color: #e65100; }
+
+    .result-detail {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .result-pickup {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      color: #444;
+    }
+    .result-pickup strong { color: #222; }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .restart-btn, .guide-btn {
+      padding: 0.65rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .restart-btn {
+      background: #333;
+      color: #fff;
+    }
+    .restart-btn:hover { background: #555; }
+    .guide-btn {
+      background: #e0e0e0;
+      color: #333;
+    }
+    .guide-btn:hover { background: #ccc; }
+
+    /* Progress breadcrumb */
+    .breadcrumb {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .crumb {
+      font-size: 0.8rem;
+      color: #999;
+    }
+    .crumb.active { color: #333; font-weight: 600; }
+    .crumb-sep { color: #ccc; font-size: 0.75rem; }
+
+    /* Search */
+    .search-box {
+      margin-bottom: 1.5rem;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.8rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 0.8rem center no-repeat;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: #999;
+    }
+    .search-results {
+      margin-top: 0.5rem;
+    }
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.8rem;
+      background: #fff;
+      border-radius: 8px;
+      margin-bottom: 0.4rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .search-result-item:hover { background: #f5f5f5; }
+    .search-item-name { font-weight: 500; }
+    .search-item-bin {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.15rem 0.6rem;
+      border-radius: 12px;
+    }
+    .search-item-bin.trash { background: #eee; color: #444; }
+    .search-item-bin.mgp { background: #e3f2fd; color: #1565c0; }
+    .search-item-bin.paper { background: #e8f5e9; color: #2e7d32; }
+    .search-item-bin.compost { background: #efebe9; color: #5d4037; }
+
+    .or-divider {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+      position: relative;
+    }
+    .or-divider::before, .or-divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #ddd;
+    }
+    .or-divider::before { left: 0; }
+    .or-divider::after { right: 0; }
+
+    /* Mobile responsive */
+    @media (max-width: 600px) {
+      body { padding: 1.25rem 0.75rem; }
+      h1 { font-size: 1.4rem; }
+      .subtitle { font-size: 0.85rem; margin-bottom: 1.25rem; }
+
+      .card { padding: 1.25rem; }
+      .question { font-size: 1.1rem; margin-bottom: 1rem; }
+
+      .option-btn {
+        padding: 0.75rem 0.9rem;
+        font-size: 0.9rem;
+      }
+      .option-btn .opt-icon { font-size: 1.3rem; width: 1.6rem; }
+
+      .result-icon { font-size: 3rem; }
+      .result-bin { font-size: 1.3rem; }
+      .result-detail { font-size: 0.85rem; }
+      .result-pickup { font-size: 0.8rem; padding: 0.6rem 0.8rem; }
+
+      .restart-btn, .guide-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+      }
+
+      .search-input {
+        font-size: 1rem;
+        padding: 0.7rem 0.8rem 0.7rem 2.5rem;
+      }
+
+      .breadcrumb { gap: 0.3rem; }
+      .crumb { font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-link">&larr; Back to full guide</a>
+    <h1>Where Does It Go?</h1>
+    <p class="subtitle">Search for an item or answer a few questions to find the right bin.</p>
+
+    <div class="search-box">
+      <input type="text" class="search-input" id="searchInput" placeholder="Type an item (e.g. pizza box, soda can, napkin...)">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="or-divider">or answer questions</div>
+
+    <div id="app" class="card"></div>
+  </div>
+
+<script>
+const ITEMS = [
+  { name: "Aluminum can", bin: "mgp", tip: "Rinse and crush flat." },
+  { name: "Aluminum foil (clean)", bin: "mgp", tip: "Ball it up. Must be clean." },
+  { name: "Aluminum foil (greasy)", bin: "trash", tip: "Too dirty to recycle." },
+  { name: "Aerosol can (empty)", bin: "mgp", tip: "Must be empty." },
+  { name: "Banana peel", bin: "compost", tip: "All fruit scraps go here." },
+  { name: "Bones", bin: "compost", tip: "Meat and fish bones are fine." },
+  { name: "Book", bin: "paper", tip: "Remove hardcovers if possible." },
+  { name: "Bread", bin: "compost", tip: "All food scraps." },
+  { name: "Broken mug", bin: "trash", tip: "Ceramics are not recyclable." },
+  { name: "Broken plate", bin: "trash", tip: "Ceramics are not recyclable." },
+  { name: "Bubble wrap", bin: "trash", tip: "Plastic film is not recyclable curbside." },
+  { name: "Butter wrapper", bin: "trash", tip: "Wax-coated paper is trash." },
+  { name: "Candle (wax)", bin: "trash", tip: "Wax is not recyclable." },
+  { name: "Cardboard box", bin: "paper", tip: "Flatten it! Remove tape and packing." },
+  { name: "Carton (milk/juice/broth)", bin: "mgp", tip: "Rinse out. Goes with metal/glass/plastic." },
+  { name: "Ceramic", bin: "trash", tip: "Not recyclable." },
+  { name: "Cheese wrapper", bin: "trash", tip: "Plastic film is trash." },
+  { name: "Chicken bones", bin: "compost", tip: "All bones can be composted in NYC." },
+  { name: "Chip bag", bin: "trash", tip: "Foil-lined bags are trash." },
+  { name: "Coffee filter + grounds", bin: "compost", tip: "Paper filter and grounds together." },
+  { name: "Coffee cup (paper)", bin: "paper", tip: "Empty and dry." },
+  { name: "Coffee cup lid (plastic)", bin: "mgp", tip: "Rigid plastic is recyclable." },
+  { name: "Condiment packet", bin: "trash", tip: "Mixed materials (foil + plastic). Squeeze out contents into compost, packet goes in trash." },
+  { name: "Cooking oil", bin: "trash", tip: "Small amounts absorbed in paper towel, then compost the towel. Large amounts are trash." },
+  { name: "Cork (wine)", bin: "trash", tip: "Natural cork is not accepted in NYC curbside recycling or compost." },
+  { name: "Delivery container (plastic)", bin: "mgp", tip: "Rinse it out. Rigid plastic." },
+  { name: "Delivery container (foam)", bin: "trash", tip: "Styrofoam is not recyclable in NYC." },
+  { name: "Diaper", bin: "trash", tip: "Always trash." },
+  { name: "Dairy (cheese, yogurt, butter)", bin: "compost", tip: "All dairy products are compostable food scraps." },
+  { name: "Drinking glass (broken)", bin: "trash", tip: "Wrap in paper for safety. Not recyclable." },
+  { name: "Egg carton (paper)", bin: "paper", tip: "Paper cartons go with paper." },
+  { name: "Egg carton (foam)", bin: "trash", tip: "Foam is not recyclable." },
+  { name: "Egg shells", bin: "compost", tip: "All food scraps." },
+  { name: "Envelope", bin: "paper", tip: "Window envelopes are fine." },
+  { name: "Fish bones", bin: "compost", tip: "All bones can be composted." },
+  { name: "Flower stems", bin: "compost", tip: "Yard/plant waste." },
+  { name: "Foam container", bin: "trash", tip: "Styrofoam is not recyclable in NYC." },
+  { name: "Food scraps", bin: "compost", tip: "All food is compostable in NYC." },
+  { name: "Fruit", bin: "compost", tip: "All food scraps." },
+  { name: "Glass bottle", bin: "mgp", tip: "Rinse out." },
+  { name: "Glass jar", bin: "mgp", tip: "Rinse out. Lids can stay on." },
+  { name: "Gloves (rubber/latex)", bin: "trash", tip: "Not recyclable." },
+  { name: "Grease (small amount on paper)", bin: "compost", tip: "Greasy paper towels and napkins go in compost. Pour liquid grease into a sealed container and put in trash." },
+  { name: "Junk mail", bin: "paper", tip: "All mail goes with paper." },
+  { name: "Juice box", bin: "mgp", tip: "It's a carton. Rinse and flatten." },
+  { name: "K-Cup / coffee pod (metal)", bin: "mgp", tip: "Empty grounds into compost first." },
+  { name: "K-Cup / coffee pod (plastic)", bin: "trash", tip: "Mixed materials, too small to sort." },
+  { name: "Leaves", bin: "compost", tip: "Yard waste." },
+  { name: "Light bulb", bin: "trash", tip: "Wrap for safety. Not recyclable curbside." },
+  { name: "Magazine", bin: "paper", tip: "Glossy is fine." },
+  { name: "Meat scraps", bin: "compost", tip: "All food scraps including meat." },
+  { name: "Metal lid / cap", bin: "mgp", tip: "All metal is recyclable." },
+  { name: "Metal pot / pan", bin: "mgp", tip: "All metal." },
+  { name: "Milk carton", bin: "mgp", tip: "Cartons go with MGP, not paper." },
+  { name: "Mirror", bin: "trash", tip: "Not the same as bottle glass." },
+  { name: "Napkin (paper)", bin: "compost", tip: "Food-soiled paper goes in compost." },
+  { name: "Newspaper", bin: "paper", tip: "Classic paper recycling." },
+  { name: "Paper bag", bin: "paper", tip: "Brown bags are paper." },
+  { name: "Paper plate (uncoated)", bin: "compost", tip: "Food-soiled paper." },
+  { name: "Paper towel", bin: "compost", tip: "Food-soiled paper. Even if just wet." },
+  { name: "Pasta (cooked)", bin: "compost", tip: "All food scraps." },
+  { name: "Peanut butter jar", bin: "mgp", tip: "Rinse out as much as you can." },
+  { name: "Pizza box", bin: "compost", tip: "Greasy pizza boxes go in compost (food-soiled paper), not paper recycling." },
+  { name: "Plastic bag", bin: "trash", tip: "Or return to a grocery store drop-off bin." },
+  { name: "Plastic bottle", bin: "mgp", tip: "Rinse, crush, leave cap on." },
+  { name: "Plastic cup", bin: "mgp", tip: "Rigid plastic." },
+  { name: "Plastic cutlery", bin: "mgp", tip: "Rigid plastic." },
+  { name: "Plastic food container", bin: "mgp", tip: "Rinse out. Rigid plastic." },
+  { name: "Plastic straw", bin: "trash", tip: "Too small to sort at recycling facility." },
+  { name: "Plastic wrap / cling film", bin: "trash", tip: "Film plastic is not recyclable curbside." },
+  { name: "Paper straw", bin: "compost", tip: "Food-soiled paper goes in compost." },
+  { name: "Parchment paper", bin: "trash", tip: "Silicone-coated parchment paper is not recyclable or compostable." },
+  { name: "Receipts", bin: "paper", tip: "Paper recycling." },
+  { name: "Rice", bin: "compost", tip: "All food scraps." },
+  { name: "Rubber band", bin: "trash", tip: "Not recyclable." },
+  { name: "Saran wrap", bin: "trash", tip: "Plastic film is trash." },
+  { name: "Shellfish shells", bin: "compost", tip: "All food scraps." },
+  { name: "Soda can", bin: "mgp", tip: "Rinse and crush." },
+  { name: "Sponge", bin: "trash", tip: "Not recyclable or compostable." },
+  { name: "Styrofoam", bin: "trash", tip: "Never recyclable in NYC." },
+  { name: "Take-out container (plastic)", bin: "mgp", tip: "Rinse. Rigid plastic." },
+  { name: "Take-out container (foam)", bin: "trash", tip: "Foam is trash in NYC." },
+  { name: "Tea bag", bin: "compost", tip: "Compostable (bag and all)." },
+  { name: "Tin can", bin: "mgp", tip: "Rinse out." },
+  { name: "Tissue", bin: "compost", tip: "Tissues are paper and go in compost." },
+  { name: "Toothbrush", bin: "trash", tip: "Mixed materials, not recyclable." },
+  { name: "Chopsticks (wood)", bin: "compost", tip: "Untreated wood is compostable." },
+  { name: "Chopsticks (plastic)", bin: "trash", tip: "Too small to sort at recycling facility." },
+  { name: "Bottle cap (plastic)", bin: "mgp", tip: "Leave it on the bottle. If loose, rigid plastic is MGP." },
+  { name: "Bottle cap (metal)", bin: "mgp", tip: "All metal is recyclable." },
+  { name: "Vegetable scraps", bin: "compost", tip: "All food scraps." },
+  { name: "Wax paper", bin: "trash", tip: "Wax-coated paper is not recyclable." },
+  { name: "Wine bottle", bin: "mgp", tip: "Glass. Rinse out." },
+  { name: "Wire hanger", bin: "mgp", tip: "Metal." },
+  { name: "Wrapping paper (plain)", bin: "paper", tip: "Non-metallic wrapping paper." },
+  { name: "Wrapping paper (metallic/glitter)", bin: "trash", tip: "Metallic or glitter paper is trash." },
+  { name: "Yogurt container", bin: "mgp", tip: "Rinse. Rigid plastic." },
+  { name: "Ziploc bag", bin: "trash", tip: "Plastic film/bags are trash." },
+];
+
+const BIN_INFO = {
+  trash:    { label: "TRASH",               icon: "🗑️", bag: "BLACK BAG",          pickup: "Wednesday & Thursday" },
+  mgp:      { label: "MGP RECYCLING",       icon: "♻️", bag: "CLEAR BAG",          pickup: "Monday" },
+  paper:    { label: "PAPER & CARDBOARD",   icon: "📄", bag: "CLEAR BAG",          pickup: "Monday" },
+  compost:  { label: "COMPOST (Brown Bin)",  icon: "🌱", bag: "COMPOSTABLE BAG",    pickup: "Monday" },
+  special:  { label: "SPECIAL DROP-OFF",     icon: "📍", bag: "DO NOT CURBSIDE",    pickup: "See details below" },
+};
+
+// Decision tree
+const tree = {
+  id: "start",
+  question: "What kind of item are you throwing out?",
+  options: [
+    { label: "Food or food scraps", icon: "🍎", next: "food" },
+    { label: "Paper or cardboard", icon: "📦", next: "paper" },
+    { label: "Bottle, can, or container", icon: "🥫", next: "container" },
+    { label: "Plastic bag or wrap", icon: "🛍️", next: "plastic_film" },
+    { label: "Something else", icon: "❓", next: "other" },
+  ]
+};
+
+const nodes = {
+  // FOOD branch
+  food: {
+    question: "Is it actual food, or paper/material that touched food?",
+    options: [
+      { label: "Actual food (scraps, leftovers, peels, bones)", icon: "🍗", next: "result_compost_food" },
+      { label: "Paper that touched food (napkin, paper towel, greasy box)", icon: "🧻", next: "result_compost_paper" },
+      { label: "Plastic or foam container with food residue", icon: "📦", next: "food_container" },
+      { label: "Cooking oil or liquid grease", icon: "🫗", next: "result_trash_oil" },
+    ]
+  },
+  food_container: {
+    question: "What's the container made of?",
+    options: [
+      { label: "Rigid plastic (hard, solid)", icon: "🥤", next: "result_mgp_rinse" },
+      { label: "Foam / Styrofoam", icon: "☁️", next: "result_trash_foam" },
+      { label: "Carton (waxy box like milk/broth)", icon: "🧃", next: "result_mgp_carton" },
+    ]
+  },
+
+  // PAPER branch
+  paper: {
+    question: "What kind of paper or cardboard?",
+    options: [
+      { label: "Cardboard box or shipping box", icon: "📦", next: "result_paper_cardboard" },
+      { label: "Newspaper, mail, office paper, magazine", icon: "📰", next: "result_paper_clean" },
+      { label: "Greasy or food-stained paper", icon: "🍕", next: "paper_greasy" },
+      { label: "Wrapping paper", icon: "🎁", next: "paper_wrapping" },
+      { label: "Wax-coated paper", icon: "🕯️", next: "result_trash_wax" },
+    ]
+  },
+  paper_greasy: {
+    question: "Any paper that touched food goes in compost, not paper recycling. What do you have?",
+    options: [
+      { label: "Greasy cardboard (pizza box, takeout box)", icon: "🍕", next: "result_compost_greasy" },
+      { label: "Paper napkins, paper towels, paper plates", icon: "🧻", next: "result_compost_paper" },
+    ]
+  },
+  paper_wrapping: {
+    question: "Is the wrapping paper metallic, glittery, or coated?",
+    options: [
+      { label: "Plain paper (matte, no glitter)", icon: "🎁", next: "result_paper_clean" },
+      { label: "Metallic, glittery, or plastic-coated", icon: "✨", next: "result_trash_wrapping" },
+    ]
+  },
+
+  // CONTAINER branch
+  container: {
+    question: "What material is the container?",
+    options: [
+      { label: "Metal (can, tin, aluminum, pot, pan)", icon: "🥫", next: "result_mgp_metal" },
+      { label: "Glass (bottle or jar)", icon: "🍾", next: "result_mgp_glass" },
+      { label: "Rigid/hard plastic", icon: "🥤", next: "result_mgp_rinse" },
+      { label: "Foam / Styrofoam", icon: "☁️", next: "result_trash_foam" },
+      { label: "Carton (milk, juice, broth box)", icon: "🧃", next: "result_mgp_carton" },
+    ]
+  },
+
+  // PLASTIC FILM branch
+  plastic_film: {
+    question: "Plastic bags and film/wrap are NOT recyclable curbside in NYC.",
+    options: [
+      { label: "Got it — put in trash", icon: "🗑️", next: "result_trash_bags" },
+      { label: "I want to recycle them at a store drop-off", icon: "🏪", next: "result_store_dropoff" },
+    ]
+  },
+
+  // OTHER branch
+  other: {
+    question: "What is it?",
+    options: [
+      { label: "Ceramics, broken dishware, or mirror", icon: "🍽️", next: "result_trash_ceramic" },
+      { label: "Light bulb", icon: "💡", next: "result_trash_bulb" },
+      { label: "Rubber gloves, sponge, or cleaning supplies", icon: "🧽", next: "result_trash_cleaning" },
+      { label: "Diaper or hygiene product", icon: "🚼", next: "result_trash_hygiene" },
+      { label: "Aluminum foil", icon: "🫓", next: "other_foil" },
+      { label: "Wood (chopsticks, skewers, popsicle sticks)", icon: "🥢", next: "result_compost_wood" },
+      { label: "Electronics or batteries", icon: "🔋", next: "result_special_ewaste" },
+      { label: "Clothing or textiles", icon: "👕", next: "result_special_textiles" },
+    ]
+  },
+  other_foil: {
+    question: "Is the aluminum foil clean or greasy/food-covered?",
+    options: [
+      { label: "Clean or lightly used (can be wiped clean)", icon: "✨", next: "result_mgp_foil_clean" },
+      { label: "Greasy, burnt, or heavily food-covered", icon: "🍳", next: "result_trash_foil_dirty" },
+    ]
+  },
+
+  // === RESULTS ===
+  result_compost_food: {
+    result: true,
+    bin: "compost",
+    detail: "All food scraps go in compost — fruit, veggies, meat, bones, dairy, bread, rice, pasta, cooked or spoiled food. Everything.",
+  },
+  result_compost_paper: {
+    result: true,
+    bin: "compost",
+    detail: "Food-soiled paper goes in compost: paper napkins, paper towels, coffee filters, uncoated paper plates, tea bags.",
+  },
+  result_compost_greasy: {
+    result: true,
+    bin: "compost",
+    detail: "Greasy pizza boxes and lightly food-soiled cardboard go in compost as food-soiled paper. Don't put them in paper recycling.",
+  },
+  result_mgp_rinse: {
+    result: true,
+    bin: "mgp",
+    detail: "Rinse it out (doesn't need to be spotless), then put it in MGP recycling. Crush to save space. Leave caps on.",
+  },
+  result_mgp_metal: {
+    result: true,
+    bin: "mgp",
+    detail: "All metal is recyclable: cans, aluminum, pots, pans, wire hangers, metal lids. Rinse food containers. Crush cans flat.",
+  },
+  result_mgp_glass: {
+    result: true,
+    bin: "mgp",
+    detail: "Glass bottles and jars go in MGP recycling. Rinse them out. Note: drinking glasses, mirrors, and window glass are TRASH, not recyclable.",
+  },
+  result_mgp_carton: {
+    result: true,
+    bin: "mgp",
+    detail: "Cartons (milk, juice, broth) go with MGP — not paper. Rinse, flatten, leave cap on.",
+  },
+  result_paper_cardboard: {
+    result: true,
+    bin: "paper",
+    detail: "Flatten the box! Remove all tape, labels, and packing material (bubble wrap goes in trash). Stack flat. Bundles must be under 18 inches.",
+  },
+  result_paper_clean: {
+    result: true,
+    bin: "paper",
+    detail: "Clean paper and cardboard go in paper recycling: newspapers, magazines, mail, envelopes, office paper, books, egg cartons.",
+  },
+  result_trash_oil: {
+    result: true,
+    bin: "trash",
+    detail: "Do NOT pour cooking oil or grease down the drain. Let it cool, pour into a sealed container (old jar, takeout container), and put in trash. Small amounts on a paper towel can go in compost.",
+  },
+  result_trash_foam: {
+    result: true,
+    bin: "trash",
+    detail: "Styrofoam and foam are NEVER recyclable in NYC. Always trash.",
+  },
+  result_trash_bags: {
+    result: true,
+    bin: "trash",
+    detail: "Plastic bags, cling wrap, Ziploc bags, and film go in trash. You can also return clean bags to grocery store drop-off bins.",
+  },
+  result_store_dropoff: {
+    result: true,
+    bin: "trash",
+    detail: "Clean, dry plastic bags can be returned to grocery/retail store drop-off bins. Otherwise, they go in trash. Never in curbside recycling.",
+  },
+  result_trash_wax: {
+    result: true,
+    bin: "trash",
+    detail: "Wax-coated paper (butcher paper, wax paper) is not recyclable or compostable. Trash.",
+  },
+  result_trash_wrapping: {
+    result: true,
+    bin: "trash",
+    detail: "Metallic, glitter, or plastic-coated wrapping paper is trash. Only plain matte wrapping paper can be recycled.",
+  },
+  result_trash_ceramic: {
+    result: true,
+    bin: "trash",
+    detail: "Ceramics, broken dishes, mugs, mirrors, and window glass go in trash. Wrap sharp pieces in paper for safety.",
+  },
+  result_trash_bulb: {
+    result: true,
+    bin: "trash",
+    detail: "Light bulbs go in trash. Wrap to prevent breakage. (CFLs with mercury can go to a SAFE disposal event.)",
+  },
+  result_trash_cleaning: {
+    result: true,
+    bin: "trash",
+    detail: "Sponges, rubber gloves, and cleaning supplies are trash.",
+  },
+  result_trash_hygiene: {
+    result: true,
+    bin: "trash",
+    detail: "Diapers and hygiene products are always trash.",
+  },
+  result_mgp_foil_clean: {
+    result: true,
+    bin: "mgp",
+    detail: "Clean aluminum foil goes in MGP recycling. Ball it up into a fist-sized ball so it doesn't blow away or get lost in sorting.",
+  },
+  result_trash_foil_dirty: {
+    result: true,
+    bin: "trash",
+    detail: "Heavily greasy or burnt aluminum foil can't be recycled. Trash it. If it's only lightly dirty, wipe it clean and recycle in MGP.",
+  },
+  result_compost_wood: {
+    result: true,
+    bin: "compost",
+    detail: "Untreated wood items like chopsticks, popsicle sticks, wooden skewers, and toothpicks go in compost. Painted or treated wood goes in trash.",
+  },
+  result_special_ewaste: {
+    result: true,
+    bin: "special",
+    detail: "Electronics and batteries should NEVER go in regular trash or recycling. Drop them off at an NYC e-waste/SAFE disposal event or an electronics store (Best Buy, Staples). Visit nyc.gov/dsny for locations and dates.",
+  },
+  result_special_textiles: {
+    result: true,
+    bin: "special",
+    detail: "Clothing and textiles should be donated or dropped in a refashionNYC bin (found at many apartment buildings and Greenmarkets). If too damaged to donate, bag them and label 'textiles' — they can still be recycled into rags/insulation. Only truly destroyed items go in trash.",
+  },
+};
+
+// State
+let history = [];
+
+function render() {
+  const app = document.getElementById("app");
+
+  if (history.length === 0) {
+    renderNode(tree);
+    return;
+  }
+
+  const current = history[history.length - 1];
+  const node = nodes[current];
+
+  if (!node) {
+    app.innerHTML = '<p>Something went wrong. <button class="restart-btn" onclick="restart()">Start over</button></p>';
+    return;
+  }
+
+  if (node.result) {
+    renderResult(node);
+  } else {
+    renderNode(node);
+  }
+}
+
+function renderNode(node) {
+  const app = document.getElementById("app");
+  const crumbs = buildBreadcrumbs();
+
+  app.innerHTML = `
+    ${crumbs}
+    <div class="question">${node.question}</div>
+    <div class="options">
+      ${node.options.map(o => `
+        <button class="option-btn" onclick="choose('${o.next}')">
+          <span class="opt-icon">${o.icon}</span>
+          <span>${o.label}</span>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderResult(node) {
+  const app = document.getElementById("app");
+  const info = BIN_INFO[node.bin];
+  const crumbs = buildBreadcrumbs();
+
+  app.innerHTML = `
+    <div class="result">
+      ${crumbs}
+      <div class="result-icon">${info.icon}</div>
+      <div class="result-bin ${node.bin}">${info.label}</div>
+      <span class="result-bag ${node.bin}">${info.bag}</span>
+      <p class="result-detail">${node.detail}</p>
+      <div class="result-pickup">
+        <strong>Pickup day:</strong> ${info.pickup}
+      </div>
+      <div class="btn-row">
+        <button class="restart-btn" onclick="restart()">Sort another item</button>
+        <a href="index.html" class="guide-btn restart-btn" style="background:#e0e0e0;color:#333;">Full guide</a>
+      </div>
+    </div>
+  `;
+}
+
+function buildBreadcrumbs() {
+  if (history.length === 0) return "";
+  let html = '<div class="breadcrumb">';
+  html += `<span class="crumb" style="cursor:pointer;text-decoration:underline;" onclick="restart()">Start</span>`;
+  history.forEach((id, i) => {
+    html += `<span class="crumb-sep">&#8250;</span>`;
+    const isLast = i === history.length - 1;
+    if (isLast) {
+      html += `<span class="crumb active">${getNodeLabel(id)}</span>`;
+    } else {
+      html += `<span class="crumb" style="cursor:pointer;text-decoration:underline;" onclick="goBack(${i + 1})">${getNodeLabel(id)}</span>`;
+    }
+  });
+  html += '</div>';
+  return html;
+}
+
+function getNodeLabel(id) {
+  const n = nodes[id];
+  if (!n) return id;
+  if (n.result) return BIN_INFO[n.bin].label;
+  return n.question.length > 30 ? n.question.slice(0, 28) + "..." : n.question;
+}
+
+function choose(nextId) {
+  history.push(nextId);
+  render();
+}
+
+function goBack(toIndex) {
+  history = history.slice(0, toIndex);
+  render();
+}
+
+function restart() {
+  history = [];
+  document.getElementById("searchInput").value = "";
+  document.getElementById("searchResults").innerHTML = "";
+  render();
+}
+
+function showItemResult(item) {
+  const info = BIN_INFO[item.bin];
+  const app = document.getElementById("app");
+  history = ["search"];
+
+  app.innerHTML = `
+    <div class="result">
+      <div class="result-icon">${info.icon}</div>
+      <div class="result-bin ${item.bin}">${info.label}</div>
+      <span class="result-bag ${item.bin}">${info.bag}</span>
+      <p class="result-detail"><strong>${item.name}</strong> &mdash; ${item.tip}</p>
+      <div class="result-pickup">
+        <strong>Pickup day:</strong> ${info.pickup}
+      </div>
+      <div class="btn-row">
+        <button class="restart-btn" onclick="restart()">Sort another item</button>
+        <a href="index.html" class="guide-btn restart-btn" style="background:#e0e0e0;color:#333;">Full guide</a>
+      </div>
+    </div>
+  `;
+}
+
+// Search
+document.getElementById("searchInput").addEventListener("input", function(e) {
+  const q = e.target.value.toLowerCase().trim();
+  const resultsDiv = document.getElementById("searchResults");
+
+  if (q.length < 2) {
+    resultsDiv.innerHTML = "";
+    return;
+  }
+
+  const matches = ITEMS.filter(item =>
+    item.name.toLowerCase().includes(q)
+  ).slice(0, 8);
+
+  if (matches.length === 0) {
+    resultsDiv.innerHTML = '<div style="padding:0.5rem;color:#999;font-size:0.9rem;">No matches found. Try the questions below.</div>';
+    return;
+  }
+
+  resultsDiv.innerHTML = matches.map(item => {
+    const info = BIN_INFO[item.bin];
+    return `
+      <div class="search-result-item" onclick='showItemResult(${JSON.stringify(item).replace(/'/g, "\\'")})'>
+        <span class="search-item-name">${item.name}</span>
+        <span class="search-item-bin ${item.bin}">${info.label}</span>
+      </div>
+    `;
+  }).join("");
+});
+
+// Init
+render();
+</script>
+</body>
+</html>

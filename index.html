@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convent Kitchen Trash Guide</title>
+  <style>
+    @page { size: A4 portrait; margin: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #e8e8e3;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      line-height: 1.3;
+    }
+    .page {
+      width: 700px;
+      background: #fff;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.12);
+    }
+
+    /* === HEADER === */
+    .hdr {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hdr h1 { font-size: 18px; }
+    .hdr small { color: #999; font-size: 11px; }
+    .hdr a {
+      color: #1a1a1a; background: #fff; padding: 6px 14px;
+      border-radius: 5px; font-size: 11px; font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* === WEEK === */
+    .week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-bottom: 2px solid #222;
+    }
+    .wd {
+      text-align: center;
+      padding: 6px 0 8px;
+      border-right: 1px solid #e0e0e0;
+      background: #fafaf7;
+    }
+    .wd:last-child { border-right: none; }
+    .wd.on { background: #fff; }
+    .wd-name { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #aaa; margin-bottom: 3px; }
+    .wd.on .wd-name { color: #333; }
+    .wd-dots { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 22px; justify-content: center; }
+    .dot { width: 16px; height: 5px; border-radius: 3px; }
+    .dot-trash { background: #555; }
+    .dot-mgp { background: #42a5f5; }
+    .dot-paper { background: #66bb6a; }
+    .dot-compost { background: #8d6e63; }
+    .dot-large { background: #ab47bc; }
+
+    .week-legend {
+      display: flex; justify-content: center; gap: 14px;
+      padding: 4px 0; background: #fafaf7; border-bottom: 1px solid #e8e8e3;
+    }
+    .wl { display: flex; align-items: center; gap: 4px; font-size: 9px; color: #777; font-weight: 600; }
+    .wl .dot { width: 10px; height: 4px; }
+
+    .time-bar {
+      background: #fffde7; padding: 5px 20px; font-size: 11px;
+      color: #827717; font-weight: 600; text-align: center;
+      border-bottom: 1px solid #f0ec9a;
+    }
+
+    /* === 4-BIN GRID === */
+    .four-bins {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .qbin { padding: 14px 16px 10px; }
+    .qbin:nth-child(1) { border-right: 1.5px solid #e0e0e0; border-bottom: 1.5px solid #e0e0e0; }
+    .qbin:nth-child(2) { border-bottom: 1.5px solid #e0e0e0; }
+    .qbin:nth-child(3) { border-right: 1.5px solid #e0e0e0; }
+
+    .qbin-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .qbin-circle {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .qbin.trash .qbin-circle { background: #444; }
+    .qbin.mgp .qbin-circle { background: #e3f2fd; }
+    .qbin.paper .qbin-circle { background: #e8f5e9; }
+    .qbin.compost .qbin-circle { background: #efebe9; }
+
+    .qbin-label { font-size: 13px; font-weight: 800; text-transform: uppercase; line-height: 1.2; }
+    .qbin.trash .qbin-label { color: #333; }
+    .qbin.mgp .qbin-label { color: #1565c0; }
+    .qbin.paper .qbin-label { color: #2e7d32; }
+    .qbin.compost .qbin-label { color: #5d4037; }
+
+    .qbin-bag {
+      font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 2px;
+    }
+    .qbin.trash .qbin-bag { background: #333; color: #fff; }
+    .qbin.mgp .qbin-bag { background: #bbdefb; color: #0d47a1; }
+    .qbin.paper .qbin-bag { background: #c8e6c9; color: #1b5e20; }
+    .qbin.compost .qbin-bag { background: #d7ccc8; color: #3e2723; }
+
+    /* Icon grid */
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .ig {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; padding: 6px 2px 5px;
+      background: #fafaf7; border-radius: 6px; text-align: center;
+    }
+    .ig-em { font-size: 22px; line-height: 1; }
+    .ig-tx { font-size: 8px; color: #777; font-weight: 500; }
+
+    .no-row { display: flex; gap: 4px; }
+    .nr {
+      display: flex; align-items: center; gap: 3px;
+      font-size: 9px; font-weight: 700; color: #c62828;
+      background: #ffebee; padding: 3px 6px; border-radius: 3px;
+    }
+    .nr-x {
+      width: 12px; height: 12px; border-radius: 50%; background: #c62828; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 900; flex-shrink: 0; line-height: 1;
+    }
+
+    /* === BOTTOM === */
+    .warn {
+      background: #ffebee; padding: 6px 20px; font-size: 11px;
+      font-weight: 700; color: #b71c1c; text-align: center;
+      border-top: 2px solid #222;
+    }
+
+    .prep {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: #fafaf7; border-top: 1px solid #e0e0e0;
+    }
+    .prep-box { padding: 10px 8px; text-align: center; border-right: 1px solid #e0e0e0; }
+    .prep-box:last-child { border-right: none; }
+    .prep-em { font-size: 24px; line-height: 1; margin-bottom: 4px; }
+    .prep-t { font-size: 10px; font-weight: 700; color: #333; }
+    .prep-d { font-size: 8px; color: #888; }
+
+    .bags {
+      display: flex; align-items: center; gap: 16px;
+      padding: 8px 20px; border-top: 1px solid #e0e0e0;
+    }
+    .bags-title { font-size: 10px; font-weight: 800; color: #333; text-transform: uppercase; letter-spacing: 0.04em; }
+    .bag-vis { display: flex; align-items: center; gap: 6px; }
+    .bag-shape {
+      width: 18px; height: 24px; border-radius: 2px 2px 4px 4px; border: 1.5px solid #bbb;
+    }
+    .bag-shape.bk { background: #333; border-color: #222; }
+    .bag-shape.cl { background: repeating-linear-gradient(45deg, #fff, #fff 2px, #e4e4e4 2px, #e4e4e4 4px); border-color: #ccc; }
+    .bag-shape.br { background: #a1887f; border-color: #795548; }
+    .bag-tx { font-size: 9px; color: #555; line-height: 1.2; }
+    .bag-tx strong { color: #222; display: block; }
+    .bag-note { font-size: 8px; color: #bbb; margin-left: auto; }
+
+    .ftr {
+      background: #fafaf7; padding: 5px 20px; font-size: 9px; color: #bbb;
+      display: flex; justify-content: space-between; border-top: 1px solid #e8e8e3;
+    }
+    .ftr a { color: #999; }
+
+    /* === MOBILE === */
+    @media (max-width: 740px) {
+      body { padding: 0; background: #fff; }
+      .page { width: 100%; box-shadow: none; }
+
+      .hdr { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 16px; }
+      .hdr h1 { font-size: 20px; }
+      .hdr a { align-self: stretch; text-align: center; padding: 10px; font-size: 14px; }
+
+      .wd-name { font-size: 11px; }
+      .wl { font-size: 10px; }
+      .time-bar { font-size: 13px; padding: 8px 16px; }
+
+      .four-bins { grid-template-columns: 1fr; }
+      .qbin { padding: 16px; border-right: none !important; border-bottom: 1.5px solid #e0e0e0 !important; }
+      .qbin:last-child { border-bottom: none !important; }
+      .qbin-label { font-size: 15px; }
+      .qbin-bag { font-size: 10px; }
+      .ig { padding: 8px 4px; }
+      .ig-em { font-size: 28px; }
+      .ig-tx { font-size: 11px; }
+      .no-row { flex-wrap: wrap; gap: 5px; }
+      .nr { font-size: 11px; padding: 4px 8px; }
+
+      .prep { grid-template-columns: 1fr 1fr; }
+      .prep-box { padding: 14px; }
+      .prep-box:nth-child(2) { border-right: none; }
+      .prep-em { font-size: 28px; }
+      .prep-t { font-size: 12px; }
+      .prep-d { font-size: 10px; }
+
+      .bags { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
+      .bag-note { margin-left: 0; }
+
+      .warn { font-size: 13px; padding: 10px 16px; }
+      .ftr { font-size: 10px; padding: 8px 16px; }
+    }
+
+    /* === PRINT === */
+    @media print {
+      body { padding: 0; background: #fff; }
+      .page { width: 100%; box-shadow: none; }
+      .hdr a { display: none; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hdr">
+    <div>
+      <h1>Convent Kitchen Trash Guide</h1>
+      <small>29 Dobbin St, Brooklyn NY 11222</small>
+    </div>
+    <a href="trash-sorter.html">Not sure? Use the sorter &rarr;</a>
+  </div>
+
+  <div class="week">
+    <div class="wd on"><div class="wd-name">Mon</div><div class="wd-dots"><div class="dot dot-mgp"></div><div class="dot dot-paper"></div><div class="dot dot-compost"></div></div></div>
+    <div class="wd"><div class="wd-name">Tue</div><div class="wd-dots"></div></div>
+    <div class="wd on"><div class="wd-name">Wed</div><div class="wd-dots"><div class="dot dot-trash"></div><div class="dot dot-large"></div></div></div>
+    <div class="wd on"><div class="wd-name">Thu</div><div class="wd-dots"><div class="dot dot-trash"></div></div></div>
+    <div class="wd on"><div class="wd-name">Fri</div><div class="wd-dots"><div class="dot dot-large"></div></div></div>
+    <div class="wd"><div class="wd-name">Sat</div><div class="wd-dots"></div></div>
+    <div class="wd"><div class="wd-name">Sun</div><div class="wd-dots"></div></div>
+  </div>
+  <div class="week-legend">
+    <span class="wl"><span class="dot dot-trash"></span> Trash</span>
+    <span class="wl"><span class="dot dot-mgp"></span> MGP</span>
+    <span class="wl"><span class="dot dot-paper"></span> Paper</span>
+    <span class="wl"><span class="dot dot-compost"></span> Compost</span>
+    <span class="wl"><span class="dot dot-large"></span> Large</span>
+  </div>
+
+  <div class="time-bar">&#128336; Bins out after 6 PM &bull; Bags out after 8 PM</div>
+
+  <div class="four-bins">
+    <div class="qbin trash">
+      <div class="qbin-top">
+        <div class="qbin-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div>
+        <div><div class="qbin-label">Trash</div><span class="qbin-bag">Black bag</span></div>
+      </div>
+      <div class="icon-grid">
+        <div class="ig"><span class="ig-em">&#9729;&#65039;</span><span class="ig-tx">Styrofoam</span></div>
+        <div class="ig"><span class="ig-em">&#128717;&#65039;</span><span class="ig-tx">Plastic bags</span></div>
+        <div class="ig"><span class="ig-em">&#128481;&#65039;</span><span class="ig-tx">Mirrors</span></div>
+        <div class="ig"><span class="ig-em">&#128294;</span><span class="ig-tx">Light bulbs</span></div>
+        <div class="ig"><span class="ig-em">&#129518;</span><span class="ig-tx">Ceramics</span></div>
+        <div class="ig"><span class="ig-em">&#129511;</span><span class="ig-tx">Sponges</span></div>
+        <div class="ig"><span class="ig-em">&#129340;</span><span class="ig-tx">Gloves</span></div>
+        <div class="ig"><span class="ig-em">&#127853;</span><span class="ig-tx">Wax paper</span></div>
+      </div>
+      <div class="no-row">
+        <span class="nr"><span class="nr-x">&times;</span> Food</span>
+        <span class="nr"><span class="nr-x">&times;</span> Recyclables</span>
+      </div>
+    </div>
+
+    <div class="qbin mgp">
+      <div class="qbin-top">
+        <div class="qbin-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 11-6.2-8.6"/><path d="M21 3v6h-6"/></svg></div>
+        <div><div class="qbin-label">Metal &middot; Glass &middot; Plastic</div><span class="qbin-bag">Clear bag</span></div>
+      </div>
+      <div class="icon-grid">
+        <div class="ig"><span class="ig-em">&#129379;</span><span class="ig-tx">Cans</span></div>
+        <div class="ig"><span class="ig-em">&#127870;</span><span class="ig-tx">Glass jars</span></div>
+        <div class="ig"><span class="ig-em">&#129380;</span><span class="ig-tx">Bottles</span></div>
+        <div class="ig"><span class="ig-em">&#127866;</span><span class="ig-tx">Wine btls</span></div>
+        <div class="ig"><span class="ig-em">&#129483;</span><span class="ig-tx">Cartons</span></div>
+        <div class="ig"><span class="ig-em">&#129384;</span><span class="ig-tx">Containers</span></div>
+        <div class="ig"><span class="ig-em">&#127859;</span><span class="ig-tx">Foil (clean)</span></div>
+        <div class="ig"><span class="ig-em">&#128260;</span><span class="ig-tx">Metal lids</span></div>
+      </div>
+      <div class="no-row">
+        <span class="nr"><span class="nr-x">&times;</span> Bags</span>
+        <span class="nr"><span class="nr-x">&times;</span> Foam</span>
+        <span class="nr"><span class="nr-x">&times;</span> Mirrors</span>
+      </div>
+    </div>
+
+    <div class="qbin paper">
+      <div class="qbin-top">
+        <div class="qbin-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div><div class="qbin-label">Paper &amp; Cardboard</div><span class="qbin-bag">Clear bag</span></div>
+      </div>
+      <div class="icon-grid">
+        <div class="ig"><span class="ig-em">&#128230;</span><span class="ig-tx">Cardboard</span></div>
+        <div class="ig"><span class="ig-em">&#128240;</span><span class="ig-tx">Newspaper</span></div>
+        <div class="ig"><span class="ig-em">&#9993;&#65039;</span><span class="ig-tx">Mail</span></div>
+        <div class="ig"><span class="ig-em">&#128214;</span><span class="ig-tx">Books</span></div>
+        <div class="ig"><span class="ig-em">&#128221;</span><span class="ig-tx">Paper</span></div>
+        <div class="ig"><span class="ig-em">&#128203;</span><span class="ig-tx">Receipts</span></div>
+        <div class="ig"><span class="ig-em">&#127873;</span><span class="ig-tx">Gift wrap</span></div>
+        <div class="ig"><span class="ig-em">&#129702;</span><span class="ig-tx">Egg ctn</span></div>
+      </div>
+      <div class="no-row">
+        <span class="nr"><span class="nr-x">&times;</span> Wax paper</span>
+        <span class="nr"><span class="nr-x">&times;</span> Tissues</span>
+        <span class="nr"><span class="nr-x">&times;</span> Napkins</span>
+      </div>
+    </div>
+
+    <div class="qbin compost">
+      <div class="qbin-top">
+        <div class="qbin-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5d4037" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C9 7 5 8 5 13a7 7 0 0014 0c0-5-4-6-7-11z"/></svg></div>
+        <div><div class="qbin-label">Compost</div><span class="qbin-bag">Compostable bag</span></div>
+      </div>
+      <div class="icon-grid">
+        <div class="ig"><span class="ig-em">&#127822;</span><span class="ig-tx">Fruit &amp; veg</span></div>
+        <div class="ig"><span class="ig-em">&#127830;</span><span class="ig-tx">Meat/bones</span></div>
+        <div class="ig"><span class="ig-em">&#9749;</span><span class="ig-tx">Coffee</span></div>
+        <div class="ig"><span class="ig-em">&#127861;</span><span class="ig-tx">Tea bags</span></div>
+        <div class="ig"><span class="ig-em">&#127829;</span><span class="ig-tx">Pizza box</span></div>
+        <div class="ig"><span class="ig-em">&#129531;</span><span class="ig-tx">Napkins</span></div>
+        <div class="ig"><span class="ig-em">&#129531;</span><span class="ig-tx">Towels</span></div>
+        <div class="ig"><span class="ig-em">&#127858;</span><span class="ig-tx">Bread/rice</span></div>
+      </div>
+      <div class="no-row">
+        <span class="nr"><span class="nr-x">&times;</span> Plastic</span>
+        <span class="nr"><span class="nr-x">&times;</span> Pet waste</span>
+        <span class="nr"><span class="nr-x">&times;</span> Liquids</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn">&#9888;&#65039; Composting is MANDATORY in NYC &mdash; fines start at $25</div>
+
+  <div class="prep">
+    <div class="prep-box"><div class="prep-em">&#128230;&#10140;&#128194;</div><div class="prep-t">Flatten boxes</div><div class="prep-d">Remove tape. Step on it.</div></div>
+    <div class="prep-box"><div class="prep-em">&#128166;&#129379;</div><div class="prep-t">Rinse containers</div><div class="prep-d">Quick rinse. Crush cans.</div></div>
+    <div class="prep-box"><div class="prep-em">&#129483; = &#128309;</div><div class="prep-t">Cartons &rarr; MGP</div><div class="prep-d">Not paper. Rinse &amp; flatten.</div></div>
+    <div class="prep-box"><div class="prep-em">&#129380;&#128272;</div><div class="prep-t">Caps stay ON</div><div class="prep-d">Leave caps on bottles.</div></div>
+  </div>
+
+  <div class="bags">
+    <span class="bags-title">Which bag?</span>
+    <div class="bag-vis"><div class="bag-shape bk"></div><div class="bag-tx"><strong>Black</strong>Trash</div></div>
+    <div class="bag-vis"><div class="bag-shape cl"></div><div class="bag-tx"><strong>Clear</strong>MGP &amp; Paper</div></div>
+    <div class="bag-vis"><div class="bag-shape br"></div><div class="bag-tx"><strong>Brown</strong>Compost</div></div>
+    <span class="bag-note">Any bodega or dollar store</span>
+  </div>
+
+  <div class="ftr">
+    <span>April 2026 &middot; <a href="https://www.nyc.gov/assets/dsny/forms/collection-schedule" target="_blank">nyc.gov/dsny</a></span>
+    <span>Brooklyn District 01</span>
+  </div>
+
+</div>
+</body>
+</html>
